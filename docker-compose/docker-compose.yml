@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
-        ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:8545/
-        ETHEREUM_JSONRPC_WS_URL: ws://host.docker.internal:8545/
+        ETHEREUM_JSONRPC_HTTP_URL: https://api.kroma.network/
+        ETHEREUM_JSONRPC_TRACE_URL: https://api.kroma.network/
+        ETHEREUM_JSONRPC_WS_URL: ws://api.kroma.network
         CHAIN_ID: '1337'
 
   nft_media_handler:
