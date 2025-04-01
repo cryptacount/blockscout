@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://sonic-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_TRACE_URL: https://sonic-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
+        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.ankr.com/sonic_mainnet
+        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.ankr.com/sonic_mainnet
         ETHEREUM_JSONRPC_WS_URL: ws://sonic.drpc.org
         CHAIN_ID: '1337'
 
