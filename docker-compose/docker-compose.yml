@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://35.187.191.74/
-        ETHEREUM_JSONRPC_TRACE_URL: http://35.187.191.74/
+        ETHEREUM_JSONRPC_HTTP_URL: https://mainnet.era.zksync.io
+        ETHEREUM_JSONRPC_TRACE_URL: https://mainnet.era.zksync.io
         ETHEREUM_JSONRPC_WS_URL: ws://ws.zkevm.cronos.org
         CHAIN_ID: '1337'
 
