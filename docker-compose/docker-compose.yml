@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://mainnet.zircuit.com/
-        ETHEREUM_JSONRPC_TRACE_URL: https://mainnet.zircuit.com/
+        ETHEREUM_JSONRPC_HTTP_URL: https://zircuit1-mainnet.liquify.com
+        ETHEREUM_JSONRPC_TRACE_URL: https://zircuit1-mainnet.liquify.com
         ETHEREUM_JSONRPC_WS_URL: ws://zircuit-mainnet.drpc.org
         CHAIN_ID: '1337'
 

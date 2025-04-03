@@ -32,7 +32,7 @@ defmodule Explorer.PagingOptions do
     batch_key: nil
   ]
 
-  @page_size 50
+  @page_size 500
 
   def page_size do
     @page_size
