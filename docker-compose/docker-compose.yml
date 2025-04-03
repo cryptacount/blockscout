@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://mainnet.era.zksync.io
-        ETHEREUM_JSONRPC_TRACE_URL: https://mainnet.era.zksync.io
-        ETHEREUM_JSONRPC_WS_URL: ws://ws.zkevm.cronos.org
+        ETHEREUM_JSONRPC_HTTP_URL: https://zksync-mainnet.zksync.io
+        ETHEREUM_JSONRPC_TRACE_URL: https://zksync-mainnet.zksync.io
+        ETHEREUM_JSONRPC_WS_URL: ws://cronos-zkevm.drpc.org
         CHAIN_ID: '1337'
 
   nft_media_handler:
