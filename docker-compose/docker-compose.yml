@@ -37,7 +37,7 @@ services:
         ETHEREUM_JSONRPC_HTTP_URL: https://api.kroma.network/
         ETHEREUM_JSONRPC_TRACE_URL: https://api.kroma.network/
         ETHEREUM_JSONRPC_WS_URL: ws://api.kroma.network
-        CHAIN_ID: '1337'
+        CHAIN_ID: '255'
 
   nft_media_handler:
     depends_on:
