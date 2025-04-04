@@ -37,7 +37,7 @@ services:
         ETHEREUM_JSONRPC_HTTP_URL: https://cronos-evm-rpc.publicnode.com
         ETHEREUM_JSONRPC_TRACE_URL: https://cronos-evm-rpc.publicnode.com
         ETHEREUM_JSONRPC_WS_URL: wss://cronos-evm-rpc.publicnode.com
-        CHAIN_ID: '1337'
+        CHAIN_ID: '388'
 
   nft_media_handler:
     depends_on:
