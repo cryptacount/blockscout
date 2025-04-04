@@ -34,10 +34,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://35.241.217.111:18545
-        ETHEREUM_JSONRPC_TRACE_URL: http://35.241.217.111:18545
-        ETHEREUM_JSONRPC_WS_URL: ws://sonic.drpc.org
-        CHAIN_ID: '1337'
+        ETHEREUM_JSONRPC_HTTP_URL: https://sonic-rpc.publicnode.com:443
+        ETHEREUM_JSONRPC_TRACE_URL: https://sonic-rpc.publicnode.com:443
+        ETHEREUM_JSONRPC_WS_URL: wss://sonic-rpc.publicnode.com:443
+        CHAIN_ID: '146'
 
   nft_media_handler:
     depends_on:
