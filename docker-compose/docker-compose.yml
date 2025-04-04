@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://mainnet.corn-rpc.com
-        ETHEREUM_JSONRPC_TRACE_URL: https://mainnet.corn-rpc.com
+        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.ankr.com/corn_maizenet
+        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.ankr.com/corn_maizenet
         #ETHEREUM_JSONRPC_WS_URL: ws://sonic.drpc.org
         CHAIN_ID: '21000000'
 
