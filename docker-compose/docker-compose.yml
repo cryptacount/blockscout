@@ -34,10 +34,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.berachain.com
-        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.berachain.com
-        ETHEREUM_JSONRPC_WS_URL: wss://berachain-rpc.publicnode.com
-        CHAIN_ID: '1337'
+        ETHEREUM_JSONRPC_HTTP_URL: https://berachain.blockpi.network/v1/rpc/public
+        ETHEREUM_JSONRPC_TRACE_URL: https://berachain.blockpi.network/v1/rpc/public
+        ETHEREUM_JSONRPC_WS_URL: wss://rpc.berachain-apis.com
+        CHAIN_ID: '80094'
 
   nft_media_handler:
     depends_on:
