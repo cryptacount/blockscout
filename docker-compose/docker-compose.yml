@@ -34,10 +34,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.soniclabs.com/
-        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.soniclabs.com/
-        ETHEREUM_JSONRPC_WS_URL: ws://sonic.drpc.org
-        CHAIN_ID: '1337'
+        ETHEREUM_JSONRPC_HTTP_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
+        ETHEREUM_JSONRPC_TRACE_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
+        ETHEREUM_JSONRPC_WS_URL: wss://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
+        CHAIN_ID: '232'
 
   nft_media_handler:
     depends_on:
