@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://berachain-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_TRACE_URL: https://berachain-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_WS_URL: wss://berachain-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
+        ETHEREUM_JSONRPC_HTTP_URL: https://berachain.blockpi.network/v1/rpc/public
+        ETHEREUM_JSONRPC_TRACE_URL: https://berachain.blockpi.network/v1/rpc/public
+        ETHEREUM_JSONRPC_WS_URL: wss://berachain-rpc.publicnode.com
         CHAIN_ID: '80094'
 
   nft_media_handler:
