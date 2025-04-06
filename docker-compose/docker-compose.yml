@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_TRACE_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_WS_URL: wss://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
+        ETHEREUM_JSONRPC_HTTP_URL: https://api.lens.matterhosted.dev
+        ETHEREUM_JSONRPC_TRACE_URL: https://api.lens.matterhosted.dev
+        #ETHEREUM_JSONRPC_WS_URL:  wss://mainnet.avail-rpc.com
         CHAIN_ID: '232'
 
   nft_media_handler:
