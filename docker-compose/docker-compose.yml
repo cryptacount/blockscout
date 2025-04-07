@@ -34,10 +34,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_TRACE_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_WS_URL: wss://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        CHAIN_ID: '232'
+        ETHEREUM_JSONRPC_HTTP_URL: https://blockchain.googleapis.com/v1/projects/cryptacount/locations/us-central1/endpoints/ethereum-mainnet/rpc?key=AIzaSyDP3JKwShi8_sGESEzijr5AfuJeRfpnE0Y
+        ETHEREUM_JSONRPC_TRACE_URL: https://blockchain.googleapis.com/v1/projects/cryptacount/locations/us-central1/endpoints/ethereum-mainnet/rpc?key=AIzaSyDP3JKwShi8_sGESEzijr5AfuJeRfpnE0Y
+        ETHEREUM_JSONRPC_WS_URL: wss://blockchain.googleapis.com/v1/projects/cryptacount/locations/us-central1/endpoints/ethereum-mainnet/rpc?key=AIzaSyDP3JKwShi8_sGESEzijr5AfuJeRfpnE0Y
+        CHAIN_ID: '1'
 
   nft_media_handler:
     depends_on:
