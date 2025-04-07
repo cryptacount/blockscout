@@ -34,10 +34,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_TRACE_URL: https://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        ETHEREUM_JSONRPC_WS_URL: wss://lens-mainnet.g.alchemy.com/v2/fYx3-sh7yrmkbjkUeCsQMvZGH-jxwkZ5
-        CHAIN_ID: '232'
+        ETHEREUM_JSONRPC_HTTP_URL: https://forno.celo.org
+        ETHEREUM_JSONRPC_TRACE_URL: https://forno.celo.org
+        ETHEREUM_JSONRPC_WS_URL: wss://forno.celo.org/ws
+        CHAIN_ID: '42220'
 
   nft_media_handler:
     depends_on:
