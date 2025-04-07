@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://blockchain.googleapis.com/v1/projects/cryptacount/locations/us-central1/endpoints/ethereum-mainnet/rpc?key=AIzaSyDP3JKwShi8_sGESEzijr5AfuJeRfpnE0Y
-        ETHEREUM_JSONRPC_TRACE_URL: https://blockchain.googleapis.com/v1/projects/cryptacount/locations/us-central1/endpoints/ethereum-mainnet/rpc?key=AIzaSyDP3JKwShi8_sGESEzijr5AfuJeRfpnE0Y
+        ETHEREUM_JSONRPC_HTTP_URL: https://ethereum-rpc.publicnode.com
+        ETHEREUM_JSONRPC_TRACE_URL: https://ethereum-rpc.publicnode.com
         ETHEREUM_JSONRPC_WS_URL: wss://blockchain.googleapis.com/v1/projects/cryptacount/locations/us-central1/endpoints/ethereum-mainnet/rpc?key=AIzaSyDP3JKwShi8_sGESEzijr5AfuJeRfpnE0Y
         CHAIN_ID: '1'
 
