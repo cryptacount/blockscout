@@ -34,10 +34,10 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://forno.celo.org
-        ETHEREUM_JSONRPC_TRACE_URL: https://forno.celo.org
-        ETHEREUM_JSONRPC_WS_URL: wss://forno.celo.org/ws
-        CHAIN_ID: '42220'
+        ETHEREUM_JSONRPC_HTTP_URL: https://api.wemix.com/
+        ETHEREUM_JSONRPC_TRACE_URL: https://api.wemix.com/
+        ETHEREUM_JSONRPC_WS_URL: ws://ws.wemix.com
+        CHAIN_ID: '1111'
 
   nft_media_handler:
     depends_on:
