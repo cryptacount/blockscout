@@ -35,7 +35,7 @@ services:
       - db:database
     environment:
         ETHEREUM_JSONRPC_HTTP_URL: 8453
-        ETHEREUM_JSONRPC_TRACE_URL: https://base-rpc.publicnode.com
+        ETHEREUM_JSONRPC_TRACE_URL: https://mainnet.base.org
         ETHEREUM_JSONRPC_WS_URL: wss://base-rpc.publicnode.com
         CHAIN_ID: '8453'
 
