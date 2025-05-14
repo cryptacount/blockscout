@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://arb-pokt.nodies.app
-        ETHEREUM_JSONRPC_TRACE_URL: https://arb-pokt.nodies.app
+        ETHEREUM_JSONRPC_HTTP_URL: https://api.zan.top/arb-one
+        ETHEREUM_JSONRPC_TRACE_URL: https://api.zan.top/arb-one
         ETHEREUM_JSONRPC_WS_URL: wss://arbitrum-one-rpc.publicnode.com
         CHAIN_ID: '42161'
 
