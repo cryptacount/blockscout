@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://arb-mainnet.g.alchemy.com/v2/demo https://arb-mainnet.g.alchemy.com/v2/demo
-        ETHEREUM_JSONRPC_TRACE_URL: https://arb-mainnet.g.alchemy.com/v2/demo
+        ETHEREUM_JSONRPC_HTTP_URL: https://1rpc.io/arb https://1rpc.io/arb
+        ETHEREUM_JSONRPC_TRACE_URL: https://1rpc.io/arb
         ETHEREUM_JSONRPC_WS_URL: wss://arbitrum.callstaticrpc.com
         CHAIN_ID: '42161'
 
