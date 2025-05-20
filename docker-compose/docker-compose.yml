@@ -34,7 +34,7 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://site1.moralis-nodes.com/arbitrum/c44080bb8f7a402cb7c51f4f58a09181 https://site1.moralis-nodes.com/arbitrum/c44080bb8f7a402cb7c51f4f58a09181
+        ETHEREUM_JSONRPC_HTTP_URL: https://site1.moralis-nodes.com/arbitrum/c44080bb8f7a402cb7c51f4f58a09181
         ETHEREUM_JSONRPC_TRACE_URL: https://site1.moralis-nodes.com/arbitrum/c44080bb8f7a402cb7c51f4f58a09181
         ETHEREUM_JSONRPC_WS_URL: wss://arbitrum.callstaticrpc.com
         CHAIN_ID: '42161'
