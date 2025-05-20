@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.therpc.io/sonic
-        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.therpc.io/sonic
-        ETHEREUM_JSONRPC_WS_URL: wss://sonic.callstaticrpc.com
+        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.soniclabs.com
+        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.soniclabs.com
+        ETHEREUM_JSONRPC_WS_URL: wss://sonic.drpc.org
         CHAIN_ID: '146'
 
   nft_media_handler:
