@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://sonic.api.onfinality.io/public
-        ETHEREUM_JSONRPC_TRACE_URL: https://sonic.api.onfinality.io/public
+        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.therpc.io/sonic
+        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.therpc.io/sonic
         ETHEREUM_JSONRPC_WS_URL: wss://sonic.callstaticrpc.com
         CHAIN_ID: '146'
 
