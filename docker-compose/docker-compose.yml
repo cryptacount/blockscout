@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://arb-pokt.nodies.app
-        ETHEREUM_JSONRPC_TRACE_URL: https://arb-pokt.nodies.app
-        ETHEREUM_JSONRPC_WS_URL: wss://arbitrum.callstaticrpc.com
+        ETHEREUM_JSONRPC_HTTP_URL: https://arb1.arbitrum.io
+        ETHEREUM_JSONRPC_TRACE_URL: https://arb1.arbitrum.io
+        ETHEREUM_JSONRPC_WS_URL: wss://arbitrum-one-rpc.publicnode.com
         CHAIN_ID: '42161'
 
   nft_media_handler:
