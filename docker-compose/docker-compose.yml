@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://arb1.arbitrum.io/rpc
-        ETHEREUM_JSONRPC_TRACE_URL: https://arb1.arbitrum.io/rpc
-        ETHEREUM_JSONRPC_WS_URL: wss://arbitrum-one-rpc.publicnode.com
+        ETHEREUM_JSONRPC_HTTP_URL: https://arbitrum-mainnet.core.chainstack.com/9db9c3aebd25929d4aef1a5231735cc7
+        ETHEREUM_JSONRPC_TRACE_URL: https://arbitrum-mainnet.core.chainstack.com/9db9c3aebd25929d4aef1a5231735cc7
+        ETHEREUM_JSONRPC_WS_URL: wss://arbitrum-mainnet.core.chainstack.com/9db9c3aebd25929d4aef1a5231735cc7
         CHAIN_ID: '42161'
 
   nft_media_handler:
