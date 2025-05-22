@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://arbitrum-one-rpc.publicnode.com
-        ETHEREUM_JSONRPC_TRACE_URL: https://arbitrum-one-rpc.publicnode.com
+        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.ankr.com/arbitrum/8c80382706a34796c6fa731849f34851b2e1f983ec2880f4b779da9f0c9932c3
+        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.ankr.com/arbitrum/8c80382706a34796c6fa731849f34851b2e1f983ec2880f4b779da9f0c9932c3
         ETHEREUM_JSONRPC_WS_URL: wss://arbitrum-one-rpc.publicnode.com
         CHAIN_ID: '42161'
 
