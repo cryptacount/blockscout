@@ -12,6 +12,6 @@ services:
     env_file:
       -  ../envs/common-user-ops-indexer.env
     environment:
-      - USER_OPS_INDEXER__INDEXER__RPC_URL=https://arbitrum-mainnet.core.chainstack.com/9db9c3aebd25929d4aef1a5231735cc7
+      - USER_OPS_INDEXER__INDEXER__RPC_URL=https://arbitrum-one-rpc.publicnode.com
       - USER_OPS_INDEXER__DATABASE__CONNECT__URL=${USER_OPS_INDEXER__DATABASE__CONNECT__URL:-postgresql://blockscout:ceWb1MeLBEeOIfk65gU8EjF8@db:5432/blockscout}
       - USER_OPS_INDEXER__DATABASE__RUN_MIGRATIONS=true
