@@ -49,11 +49,6 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     :ok
   end
 
-  defp topic(topic_hex_string) do
-    {:ok, topic} = Explorer.Chain.Hash.Full.cast(topic_hex_string)
-    topic
-  end
-
   describe "/addresses/{address_hash}" do
     test "get 200 on non existing address", %{conn: conn} do
       address = build(:address)
@@ -80,7 +75,8 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
         "watchlist_address_id" => nil,
         "has_beacon_chain_withdrawals" => false,
         "ens_domain_name" => nil,
-        "metadata" => nil
+        "metadata" => nil,
+        "creation_status" => nil
       }
 
       stub(EthereumJSONRPC.Mox, :json_rpc, fn _, _ ->
@@ -122,7 +118,8 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
         "watchlist_address_id" => nil,
         "has_beacon_chain_withdrawals" => false,
         "ens_domain_name" => nil,
-        "metadata" => nil
+        "metadata" => nil,
+        "creation_status" => nil
       }
 
       stub(EthereumJSONRPC.Mox, :json_rpc, fn _, _ ->
@@ -162,6 +159,28 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       response = json_response(request, 200)
       assert response["is_contract"]
       assert response["creation_transaction_hash"] == to_string(succeeded_transaction.hash)
+      assert response["creation_status"] == "success"
+    end
+
+    test "returns failed creation transaction for a contract",
+         %{conn: conn} do
+      contract_address = insert(:address, contract_code: "0x")
+
+      failed_transaction =
+        insert(:transaction,
+          created_contract_address_hash: contract_address.hash
+        )
+        |> with_block(status: :error)
+
+      stub(EthereumJSONRPC.Mox, :json_rpc, fn _, _ ->
+        {:ok, []}
+      end)
+
+      request = get(conn, "/api/v2/addresses/#{Address.checksum(contract_address.hash)}")
+      response = json_response(request, 200)
+      assert response["is_contract"]
+      assert response["creation_transaction_hash"] == to_string(failed_transaction.hash)
+      assert response["creation_status"] == "failed"
     end
 
     defp check_response(pattern_response, response) do
@@ -188,6 +207,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       assert pattern_response["has_beacon_chain_withdrawals"] == response["has_beacon_chain_withdrawals"]
       assert pattern_response["ens_domain_name"] == response["ens_domain_name"]
       assert pattern_response["metadata"] == response["metadata"]
+      assert pattern_response["creation_status"] == response["creation_status"]
     end
 
     test "get EIP-1167 proxy contract info", %{conn: conn} do
@@ -278,6 +298,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
                "watchlist_names" => [],
                "creator_address_hash" => ^from,
                "creation_transaction_hash" => ^transaction_hash,
+               "creation_status" => "success",
                "proxy_type" => "eip1167",
                "implementations" => [
                  %{
@@ -328,6 +349,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
                "watchlist_names" => [],
                "creator_address_hash" => ^from,
                "creation_transaction_hash" => ^transaction_hash,
+               "creation_status" => "success",
                "proxy_type" => "eip1967",
                "implementations" => [
                  %{
@@ -401,6 +423,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
                "watchlist_names" => [],
                "creator_address_hash" => ^from,
                "creation_transaction_hash" => ^transaction_hash,
+               "creation_status" => "success",
                "proxy_type" => "resolved_delegate_proxy",
                "implementations" => [
                  %{
@@ -2371,7 +2394,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
           block: transaction.block,
           block_number: transaction.block_number,
           address: address,
-          first_topic: topic(@first_topic_hex_string_1)
+          first_topic: TestHelper.topic(@first_topic_hex_string_1)
         )
 
       request = get(conn, "/api/v2/addresses/#{address.hash}/logs?topic=#{@first_topic_hex_string_1}")
@@ -2379,6 +2402,146 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       assert Enum.count(response["items"]) == 1
       assert response["next_page_params"] == nil
       compare_item(log, Enum.at(response["items"], 0))
+    end
+
+    test "log could be decoded via verified implementation", %{conn: conn} do
+      address = insert(:contract_address)
+
+      contract_address = insert(:contract_address)
+
+      smart_contract =
+        insert(:smart_contract,
+          address_hash: contract_address.hash,
+          abi: [
+            %{
+              "name" => "OptionSettled",
+              "type" => "event",
+              "inputs" => [
+                %{"name" => "accountId", "type" => "uint256", "indexed" => true, "internalType" => "uint256"},
+                %{"name" => "option", "type" => "address", "indexed" => false, "internalType" => "address"},
+                %{"name" => "subId", "type" => "uint256", "indexed" => false, "internalType" => "uint256"},
+                %{"name" => "amount", "type" => "int256", "indexed" => false, "internalType" => "int256"},
+                %{"name" => "value", "type" => "int256", "indexed" => false, "internalType" => "int256"}
+              ],
+              "anonymous" => false
+            }
+          ]
+        )
+
+      topic1_bytes = ExKeccak.hash_256("OptionSettled(uint256,address,uint256,int256,int256)")
+      topic1 = "0x" <> Base.encode16(topic1_bytes, case: :lower)
+      topic2 = "0x0000000000000000000000000000000000000000000000000000000000005d19"
+
+      log_data =
+        "0x000000000000000000000000aeb81cbe6b19ceeb0dbe0d230cffe35bb40a13a700000000000000000000000000000000000000000000045d964b80006597b700fffffffffffffffffffffffffffffffffffffffffffffffffe55aca2c2f40000ffffffffffffffffffffffffffffffffffffffffffffffe3a8289da3d7a13ef2"
+
+      transaction = :transaction |> insert() |> with_block()
+
+      log =
+        insert(:log,
+          transaction: transaction,
+          first_topic: TestHelper.topic(topic1),
+          second_topic: TestHelper.topic(topic2),
+          third_topic: nil,
+          fourth_topic: nil,
+          data: log_data,
+          address: address
+        )
+
+      insert(:proxy_implementation,
+        proxy_address_hash: address.hash,
+        proxy_type: "eip1167",
+        address_hashes: [smart_contract.address_hash],
+        names: ["Test"]
+      )
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/logs")
+
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 1
+      assert response["next_page_params"] == nil
+      log_from_api = Enum.at(response["items"], 0)
+      compare_item(log, log_from_api)
+      assert not is_nil(log_from_api["decoded"])
+
+      assert log_from_api["decoded"] == %{
+               "method_call" =>
+                 "OptionSettled(uint256 indexed accountId, address option, uint256 subId, int256 amount, int256 value)",
+               "method_id" => "d20a68b2",
+               "parameters" => [
+                 %{
+                   "indexed" => true,
+                   "name" => "accountId",
+                   "type" => "uint256",
+                   "value" => "23833"
+                 },
+                 %{
+                   "indexed" => false,
+                   "name" => "option",
+                   "type" => "address",
+                   "value" => "0xAeB81cbe6b19CeEB0dBE0d230CFFE35Bb40a13a7"
+                 },
+                 %{
+                   "indexed" => false,
+                   "name" => "subId",
+                   "type" => "uint256",
+                   "value" => "20615843020801704441600"
+                 },
+                 %{
+                   "indexed" => false,
+                   "name" => "amount",
+                   "type" => "int256",
+                   "value" => "-120000000000000000"
+                 },
+                 %{
+                   "indexed" => false,
+                   "name" => "value",
+                   "type" => "int256",
+                   "value" => "-522838470013113778446"
+                 }
+               ]
+             }
+    end
+
+    test "test corner case, when preload functions face absent smart contract", %{conn: conn} do
+      address = insert(:contract_address)
+
+      contract_address = insert(:contract_address)
+
+      topic1_bytes = ExKeccak.hash_256("OptionSettled(uint256,address,uint256,int256,int256)")
+      topic1 = "0x" <> Base.encode16(topic1_bytes, case: :lower)
+      topic2 = "0x0000000000000000000000000000000000000000000000000000000000005d19"
+
+      log_data =
+        "0x000000000000000000000000aeb81cbe6b19ceeb0dbe0d230cffe35bb40a13a700000000000000000000000000000000000000000000045d964b80006597b700fffffffffffffffffffffffffffffffffffffffffffffffffe55aca2c2f40000ffffffffffffffffffffffffffffffffffffffffffffffe3a8289da3d7a13ef2"
+
+      transaction = :transaction |> insert() |> with_block()
+
+      log =
+        insert(:log,
+          transaction: transaction,
+          first_topic: TestHelper.topic(topic1),
+          second_topic: TestHelper.topic(topic2),
+          third_topic: nil,
+          fourth_topic: nil,
+          data: log_data,
+          address: address
+        )
+
+      insert(:proxy_implementation,
+        proxy_address_hash: address.hash,
+        proxy_type: "eip1167",
+        address_hashes: [contract_address.hash],
+        names: ["Test"]
+      )
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/logs")
+
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 1
+      assert response["next_page_params"] == nil
+      log_from_api = Enum.at(response["items"], 0)
+      compare_item(log, log_from_api)
     end
   end
 
