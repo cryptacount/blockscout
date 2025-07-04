@@ -2156,6 +2156,55 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       compare_item(acb, Enum.at(response["items"], 0))
     end
 
+    test "get coin balance with transaction", %{conn: conn} do
+      address = insert(:address)
+
+      transaction =
+        :transaction
+        |> insert(to_address_hash: address.hash, to_address: address, value: 123)
+        |> with_block()
+
+      acb = insert(:address_coin_balance, address: address, block_number: transaction.block_number)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/coin-balance-history")
+
+      assert %{"items" => [acb_json], "next_page_params" => nil} = json_response(request, 200)
+      assert acb_json["transaction_hash"] == to_string(transaction.hash)
+
+      compare_item(acb, acb_json)
+    end
+
+    test "get coin balance with internal transaction", %{conn: conn} do
+      transaction =
+        :transaction
+        |> insert()
+        |> with_block()
+
+      address = insert(:address)
+
+      insert(:internal_transaction,
+        type: "call",
+        call_type: "call",
+        transaction: transaction,
+        block: transaction.block,
+        to_address: address,
+        value: 123,
+        block_number: transaction.block_number,
+        index: 1,
+        block_index: 1
+      )
+
+      insert(:address_coin_balance)
+      acb = insert(:address_coin_balance, address: address, block_number: transaction.block_number)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/coin-balance-history")
+
+      assert %{"items" => [acb_json], "next_page_params" => nil} = json_response(request, 200)
+      assert acb_json["transaction_hash"] == to_string(transaction.hash)
+
+      compare_item(acb, acb_json)
+    end
+
     test "coin balance history can paginate", %{conn: conn} do
       address = insert(:address)
 
@@ -2479,7 +2528,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
                    "indexed" => false,
                    "name" => "option",
                    "type" => "address",
-                   "value" => "0xAeB81cbe6b19CeEB0dBE0d230CFFE35Bb40a13a7"
+                   "value" => Address.checksum("0xAeB81cbe6b19CeEB0dBE0d230CFFE35Bb40a13a7")
                  },
                  %{
                    "indexed" => false,
@@ -2542,6 +2591,65 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       assert response["next_page_params"] == nil
       log_from_api = Enum.at(response["items"], 0)
       compare_item(log, log_from_api)
+    end
+
+    test "ignore logs without topics when trying to decode with sig provider", %{conn: conn} do
+      bypass = Bypass.open()
+
+      old_env_sig_provider = Application.get_env(:explorer, Explorer.SmartContract.SigProviderInterface)
+
+      Application.put_env(:explorer, Explorer.SmartContract.SigProviderInterface,
+        enabled: true,
+        service_url: "http://localhost:#{bypass.port}"
+      )
+
+      on_exit(fn ->
+        Application.put_env(:explorer, Explorer.SmartContract.SigProviderInterface, old_env_sig_provider)
+      end)
+
+      address = insert(:contract_address)
+
+      log_data =
+        "0x000000000000000000000000aeb81cbe6b19ceeb0dbe0d230cffe35bb40a13a700000000000000000000000000000000000000000000045d964b80006597b700fffffffffffffffffffffffffffffffffffffffffffffffffe55aca2c2f40000ffffffffffffffffffffffffffffffffffffffffffffffe3a8289da3d7a13ef2"
+
+      transaction = :transaction |> insert() |> with_block()
+
+      insert(:log,
+        transaction: transaction,
+        first_topic: nil,
+        second_topic: nil,
+        third_topic: nil,
+        fourth_topic: nil,
+        data: log_data,
+        address: address
+      )
+
+      insert(:log,
+        transaction: transaction,
+        first_topic: TestHelper.topic("0x0000000000000000000000000000000000000000000000000000000000005d19"),
+        second_topic: nil,
+        third_topic: nil,
+        fourth_topic: nil,
+        data: log_data,
+        address: address
+      )
+
+      # cspell:disable
+      Bypass.expect_once(bypass, "POST", "/api/v1/abi/events%3Abatch-get", fn conn ->
+        # cspell:enable
+        {:ok, body, conn} = Plug.Conn.read_body(conn)
+        body = Jason.decode!(body)
+        assert Enum.count(body["requests"]) == 1
+
+        Conn.resp(conn, 200, Jason.encode!([]))
+      end)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/logs")
+
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 2
+
+      Bypass.down(bypass)
     end
   end
 
@@ -3148,7 +3256,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
           transaction_index: transaction.index,
           block_hash: transaction.block_hash,
           block_index: x,
-          from_address: address
+          to_address: address
         )
       end
 

@@ -50,7 +50,7 @@ defmodule Explorer.Factory do
     Withdrawal
   }
 
-  alias Explorer.Chain.Optimism.OutputRoot
+  alias Explorer.Chain.Optimism.{InteropMessage, OutputRoot}
   alias Explorer.Chain.SmartContract.Proxy.Models.Implementation
   alias Explorer.Chain.Zilliqa.Hash.BLSPublicKey
   alias Explorer.Chain.Zilliqa.Staker, as: ZilliqaStaker
@@ -1276,6 +1276,22 @@ defmodule Explorer.Factory do
     }
   end
 
+  def op_interop_message_factory do
+    %InteropMessage{
+      sender_address_hash: insert(:address).hash,
+      target_address_hash: insert(:address).hash,
+      nonce: sequence("op_interop_message_nonce", & &1),
+      init_chain_id: 1,
+      init_transaction_hash: insert(:transaction).hash,
+      block_number: insert(:block).number,
+      timestamp: DateTime.utc_now(),
+      relay_chain_id: 2,
+      relay_transaction_hash: transaction_hash(),
+      payload: "0x123123",
+      failed: random_bool()
+    }
+  end
+
   def op_output_root_factory do
     %OutputRoot{
       l2_output_index: op_output_root_l2_output_index(),
@@ -1319,7 +1335,8 @@ defmodule Explorer.Factory do
 
     %ValidatorStability{
       address_hash: address.hash,
-      state: Enum.random(0..2)
+      state: Enum.random(0..2),
+      blocks_validated: Enum.random(0..100)
     }
   end
 

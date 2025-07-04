@@ -182,7 +182,8 @@ config :block_scout_web, BlockScoutWeb.MicroserviceInterfaces.TransactionInterpr
 config :ueberauth, Ueberauth.Strategy.Auth0.OAuth,
   domain: System.get_env("ACCOUNT_AUTH0_DOMAIN"),
   client_id: System.get_env("ACCOUNT_AUTH0_CLIENT_ID"),
-  client_secret: System.get_env("ACCOUNT_AUTH0_CLIENT_SECRET")
+  client_secret: System.get_env("ACCOUNT_AUTH0_CLIENT_SECRET"),
+  auth0_application_id: ConfigHelper.safe_get_env("ACCOUNT_AUTH0_APPLICATION_ID", nil) |> String.replace(".", "")
 
 # Configures Ueberauth local settings
 config :ueberauth, Ueberauth, logout_url: "https://#{System.get_env("ACCOUNT_AUTH0_DOMAIN")}/v2/logout"
@@ -451,7 +452,8 @@ config :explorer, Explorer.Market.Source.CryptoRank,
       ConfigHelper.parse_integer_or_nil_env_var("EXCHANGE_RATES_CRYPTORANK_COIN_ID"),
   secondary_coin_id:
     System.get_env("MARKET_CRYPTORANK_SECONDARY_COIN_ID") ||
-      ConfigHelper.parse_integer_or_nil_env_var("EXCHANGE_RATES_CRYPTORANK_SECONDARY_COIN_ID")
+      ConfigHelper.parse_integer_or_nil_env_var("EXCHANGE_RATES_CRYPTORANK_SECONDARY_COIN_ID"),
+  currency: "USD"
 
 config :explorer, Explorer.Market.Source.DefiLlama,
   coin_id: System.get_env("MARKET_DEFILLAMA_COIN_ID"),
@@ -727,6 +729,12 @@ config :explorer, Explorer.Migrator.ReindexDuplicatedInternalTransactions,
   batch_size: ConfigHelper.parse_integer_env_var("MIGRATION_REINDEX_DUPLICATED_INTERNAL_TRANSACTIONS_BATCH_SIZE", 100),
   concurrency: ConfigHelper.parse_integer_env_var("MIGRATION_REINDEX_DUPLICATED_INTERNAL_TRANSACTIONS_CONCURRENCY", 1),
   timeout: ConfigHelper.parse_time_env_var("MIGRATION_REINDEX_DUPLICATED_INTERNAL_TRANSACTIONS_TIMEOUT", "0s")
+
+config :explorer, Explorer.Migrator.ReindexBlocksWithMissingTransactions,
+  batch_size: ConfigHelper.parse_integer_env_var("MIGRATION_REINDEX_BLOCKS_WITH_MISSING_TRANSACTIONS_BATCH_SIZE", 10),
+  concurrency: ConfigHelper.parse_integer_env_var("MIGRATION_REINDEX_BLOCKS_WITH_MISSING_TRANSACTIONS_CONCURRENCY", 1),
+  timeout: ConfigHelper.parse_time_env_var("MIGRATION_REINDEX_BLOCKS_WITH_MISSING_TRANSACTIONS_TIMEOUT", "0s"),
+  enabled: ConfigHelper.parse_bool_env_var("MIGRATION_REINDEX_BLOCKS_WITH_MISSING_TRANSACTIONS_ENABLED", "false")
 
 config :explorer, Explorer.Migrator.RestoreOmittedWETHTransfers,
   concurrency: ConfigHelper.parse_integer_env_var("MIGRATION_RESTORE_OMITTED_WETH_TOKEN_TRANSFERS_CONCURRENCY", 5),
