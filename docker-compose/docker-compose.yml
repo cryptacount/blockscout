@@ -34,9 +34,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.soniclabs.com
-        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.soniclabs.com
-        ETHEREUM_JSONRPC_WS_URL: wss://sonic.drpc.org
+        ETHEREUM_JSONRPC_HTTP_URL: https://avalanche-c-chain-rpc.publicnode.com
+        ETHEREUM_JSONRPC_TRACE_URL: https://avalanche-c-chain-rpc.publicnode.com
+        ETHEREUM_JSONRPC_WS_URL: wss://avalanche-c-chain-rpc.publicnode.com
         CHAIN_ID: '146'
 
   nft_media_handler:
