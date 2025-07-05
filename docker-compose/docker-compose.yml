@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://avalanche.api.onfinality.io/public/ext/bc/C/rpc
-        ETHEREUM_JSONRPC_TRACE_URL: https://avalanche.api.onfinality.io/public/ext/bc/C/rpc
+        ETHEREUM_JSONRPC_HTTP_URL: https://spectrum-01.simplystaking.xyz/avalanche-mn-rpc/ext/bc/C/rpc
+        ETHEREUM_JSONRPC_TRACE_URL: https://spectrum-01.simplystaking.xyz/avalanche-mn-rpc/ext/bc/C/rpc
         ETHEREUM_JSONRPC_WS_URL: wss://avalanche-c-chain-rpc.publicnode.com
         CHAIN_ID: '146'
 
