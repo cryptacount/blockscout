@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://ava-mainnet.public.blastapi.io/ext/bc/C/rpc
-        ETHEREUM_JSONRPC_TRACE_URL: https://ava-mainnet.public.blastapi.io/ext/bc/C/rpc
+        ETHEREUM_JSONRPC_HTTP_URL: https://endpoints.omniatech.io/v1/avax/mainnet/public
+        ETHEREUM_JSONRPC_TRACE_URL: https://endpoints.omniatech.io/v1/avax/mainnet/public
         ETHEREUM_JSONRPC_WS_URL: wss://avalanche-c-chain-rpc.publicnode.com
         CHAIN_ID: '146'
 
