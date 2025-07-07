@@ -34,8 +34,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://api.avax.network/ext/bc/C/rpc
-        ETHEREUM_JSONRPC_TRACE_URL: https://api.avax.network/ext/bc/C/rpc
+        ETHEREUM_JSONRPC_HTTP_URL: http://152.53.53.172:9650/ext/bc/C/rpc
+        ETHEREUM_JSONRPC_TRACE_URL: http://152.53.53.172:9650/ext/bc/C/rpc
         ETHEREUM_JSONRPC_WS_URL: wss://api.avax.network/ext/bc/C/ws
         CHAIN_ID: '146'
 
