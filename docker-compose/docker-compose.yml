@@ -33,6 +33,8 @@ services:
         RELEASE_VERSION: 8.1.1
     links:
       - db:database
+    ports:
+      - "4000:4000"
     environment:
         ETHEREUM_JSONRPC_HTTP_URL: http://152.53.53.172:9650/ext/bc/C/rpc
         ETHEREUM_JSONRPC_TRACE_URL: http://152.53.53.172:9650/ext/bc/C/rpc
