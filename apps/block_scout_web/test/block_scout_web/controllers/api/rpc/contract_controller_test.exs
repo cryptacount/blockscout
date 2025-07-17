@@ -76,6 +76,14 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
     }
   end
 
+  setup do
+    Application.put_env(:tesla, :adapter, Tesla.Adapter.Mint)
+
+    on_exit(fn ->
+      Application.put_env(:tesla, :adapter, Explorer.Mock.TeslaAdapter)
+    end)
+  end
+
   describe "listcontracts" do
     setup do
       %{params: %{"module" => "contract", "action" => "listcontracts"}}
@@ -1140,6 +1148,46 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert timestamp == to_string(unix_timestamp)
       assert contract_factory == to_string(internal_transaction.from_address_hash)
       assert creation_bytecode == to_string(internal_transaction.init)
+    end
+
+    test "get contract creation info via internal transaction with index 0 and parent transaction - contractFactory should be empty",
+         %{
+           conn: conn,
+           params: params
+         } do
+      {:ok, block_timestamp, _} = DateTime.from_iso8601("2021-05-05T21:42:11.000000Z")
+      block = insert(:block, timestamp: block_timestamp)
+      contract_address = insert(:contract_address)
+
+      # Create a transaction that creates the contract
+      transaction =
+        :transaction
+        |> insert(created_contract_address: contract_address)
+        |> with_block(block)
+
+      # Also create an internal transaction with index 0 for the same contract
+      insert(:internal_transaction_create,
+        transaction: transaction,
+        # index 0 should result in empty contractFactory
+        index: 0,
+        created_contract_address: contract_address,
+        block_hash: transaction.block_hash,
+        block_index: transaction.index
+      )
+
+      assert %{
+               "result" => [
+                 %{
+                   "contractFactory" => "",
+                   "contractCreator" => contract_creator
+                 }
+               ]
+             } =
+               conn
+               |> get("/api", Map.put(params, "contractaddresses", to_string(contract_address)))
+               |> json_response(200)
+
+      assert contract_creator == to_string(transaction.from_address_hash)
     end
   end
 
