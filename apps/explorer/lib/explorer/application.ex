@@ -37,6 +37,7 @@ defmodule Explorer.Application do
   alias Explorer.Market.MarketHistoryCache
   alias Explorer.MicroserviceInterfaces.MultichainSearch
   alias Explorer.Repo.PrometheusLogger
+  alias Explorer.Utility.Hammer
 
   @impl Application
   def start(_type, _args) do
@@ -190,6 +191,7 @@ defmodule Explorer.Application do
         configure_mode_dependent_process(Explorer.Migrator.SanitizeEmptyContractCodeAddresses, :indexer),
         configure_mode_dependent_process(Explorer.Migrator.ReindexInternalTransactionsWithIncompatibleStatus, :indexer),
         configure_mode_dependent_process(Explorer.Migrator.ReindexDuplicatedInternalTransactions, :indexer),
+        configure_mode_dependent_process(Explorer.Migrator.MergeAdjacentMissingBlockRanges, :indexer),
         configure_mode_dependent_process(Explorer.Migrator.ReindexBlocksWithMissingTransactions, :indexer),
         configure_mode_dependent_process(
           Explorer.Migrator.HeavyDbIndexOperation.CreateAddressesVerifiedIndex,
@@ -304,7 +306,8 @@ defmodule Explorer.Application do
         Explorer.Migrator.RefetchContractCodes |> configure() |> configure_chain_type_dependent_process(:zksync),
         configure(Explorer.Chain.Fetcher.AddressesBlacklist),
         Explorer.Migrator.SwitchPendingOperations,
-        configure_mode_dependent_process(Explorer.Utility.RateLimiter, :api)
+        configure_mode_dependent_process(Explorer.Utility.RateLimiter, :api),
+        Hammer.child_for_supervisor() |> configure_mode_dependent_process(:api)
       ]
       |> List.flatten()
 
@@ -351,6 +354,10 @@ defmodule Explorer.Application do
     else
       []
     end
+  end
+
+  defp should_start?({process, _opts}) do
+    Application.get_env(:explorer, process, [])[:enabled] == true
   end
 
   defp should_start?(process) do

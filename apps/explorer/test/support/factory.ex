@@ -38,9 +38,10 @@ defmodule Explorer.Factory do
     Hash,
     InternalTransaction,
     Log,
-    MultichainSearchDbExportRetryQueue,
+    MultichainSearchDb,
     PendingBlockOperation,
     PendingTransactionOperation,
+    SignedAuthorization,
     SmartContract,
     SmartContractAdditionalSource,
     Token,
@@ -62,7 +63,7 @@ defmodule Explorer.Factory do
   alias Explorer.Market.MarketHistory
   alias Explorer.Repo
 
-  alias Explorer.Utility.{MissingBalanceOfToken, MissingBlockRange}
+  alias Explorer.Utility.{EventNotification, MissingBalanceOfToken, MissingBlockRange}
 
   alias Ueberauth.Strategy.Auth0
   alias Ueberauth.Auth.{Extra, Info}
@@ -744,8 +745,8 @@ defmodule Explorer.Factory do
     %PendingTransactionOperation{}
   end
 
-  def multichain_search_db_export_retry_queue_factory do
-    %MultichainSearchDbExportRetryQueue{}
+  def multichain_search_db_main_export_queue_factory do
+    %MultichainSearchDb.MainExportQueue{}
   end
 
   def internal_transaction_factory() do
@@ -1007,6 +1008,21 @@ defmodule Explorer.Factory do
       hash: transaction_hash(),
       index: 0,
       uncle_hash: block_hash()
+    }
+  end
+
+  def signed_authorization_factory do
+    %SignedAuthorization{
+      transaction: build(:transaction),
+      index: 0,
+      chain_id: 0,
+      address: address_hash(),
+      nonce: 0,
+      r: 0,
+      s: 0,
+      v: 0,
+      authority: address_hash(),
+      status: nil
     }
   end
 
@@ -1397,6 +1413,13 @@ defmodule Explorer.Factory do
       fourth_topic: nil,
       index: sequence("log_index", & &1),
       transaction: transaction
+    }
+  end
+
+  def event_notification_factory do
+    %EventNotification{
+      data: "test_data",
+      inserted_at: DateTime.utc_now()
     }
   end
 end

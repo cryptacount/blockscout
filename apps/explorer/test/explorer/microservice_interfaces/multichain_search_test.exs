@@ -4,19 +4,21 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
   import Mox
 
   alias Explorer.Chain.Cache.ChainId
-  alias Explorer.Chain.MultichainSearchDbExportRetryQueue
+  alias Explorer.Chain.MultichainSearchDb.MainExportQueue
   alias Explorer.MicroserviceInterfaces.MultichainSearch
   alias Explorer.{Repo, TestHelper}
   alias Plug.Conn
 
   setup :verify_on_exit!
 
-  @error_msg "Error while sending request to Multichain Search DB Service"
-
   describe "batch_import/2" do
     setup do
       Supervisor.terminate_child(Explorer.Supervisor, ChainId.child_id())
       Supervisor.restart_child(Explorer.Supervisor, ChainId.child_id())
+
+      on_exit(fn ->
+        Application.put_env(:tesla, :adapter, Explorer.Mock.TeslaAdapter)
+      end)
 
       :ok
     end
@@ -33,6 +35,8 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
 
     test "processes chunks and returns {:ok, result} when the service is enabled" do
       bypass = Bypass.open()
+
+      Application.put_env(:tesla, :adapter, Tesla.Adapter.Mint)
 
       Application.put_env(:explorer, MultichainSearch,
         service_url: "http://localhost:#{bypass.port}",
@@ -55,7 +59,7 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
         )
       end)
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 0
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 0
 
       block_1 = insert(:block)
       block_2 = insert(:block)
@@ -73,11 +77,13 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
       }
 
       assert {:ok, {:chunks_processed, _}} = MultichainSearch.batch_import(params)
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 0
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 0
     end
 
-    test "returns {:error, data_to_retry} when an error occurs during processing and 'multichain_search_db_export_retry_queue' table is populated" do
+    test "returns {:error, data_to_retry} when an error occurs during processing and 'multichain_search_db_main_export_queue' table is populated" do
       bypass = Bypass.open()
+
+      Application.put_env(:tesla, :adapter, Tesla.Adapter.Mint)
 
       Application.put_env(:explorer, MultichainSearch,
         service_url: "http://localhost:#{bypass.port}",
@@ -100,7 +106,7 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
         )
       end)
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 0
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 0
 
       address_1 = insert(:address)
       address_2 = insert(:address)
@@ -132,8 +138,8 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
                 ]
               }} == MultichainSearch.batch_import(params)
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 6
-      records = Repo.all(MultichainSearchDbExportRetryQueue)
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 6
+      records = Repo.all(MainExportQueue)
 
       assert Enum.all?(records, fn record ->
                (record.hash == address_1.hash.bytes && record.hash_type == :address) ||
@@ -152,16 +158,13 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
         addresses_chunk_size: 7000
       )
 
-      Application.put_env(:explorer, :http_adapter, Explorer.Mox.HTTPoison)
-
       on_exit(fn ->
         Application.put_env(:explorer, MultichainSearch, service_url: nil, api_key: nil, addresses_chunk_size: 7000)
-        Application.put_env(:explorer, :http_adapter, HTTPoison)
       end)
 
       TestHelper.get_chain_id_mock()
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 0
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 0
 
       block_1 = insert(:block)
       block_2 = insert(:block)
@@ -175,18 +178,28 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
           insert(:address)
         end
 
-      Explorer.Mox.HTTPoison
-      |> expect(:post, fn "http://localhost:1234/api/v1/import:batch", _expected_body, _headers, _options ->
-        {:ok, %HTTPoison.Response{status_code: 200, body: Jason.encode!(%{"status" => "ok"})}}
-      end)
+      Tesla.Test.expect_tesla_call(
+        times: 1,
+        returns: fn %{url: "http://localhost:1234/api/v1/import:batch"}, _opts ->
+          {:ok,
+           %Tesla.Env{
+             status: 200,
+             body: Jason.encode!(%{"status" => "ok"})
+           }}
+        end
+      )
 
-      Explorer.Mox.HTTPoison
-      |> expect(:post, fn "http://localhost:1234/api/v1/import:batch",
-                          _expected_body,
-                          [{"Content-Type", "application/json"}],
-                          _options ->
-        {:ok, %HTTPoison.Response{status_code: 500, body: Jason.encode!(%{"code" => 0, "message" => "Error"})}}
-      end)
+      Tesla.Test.expect_tesla_call(
+        times: 1,
+        returns: fn %{url: "http://localhost:1234/api/v1/import:batch", headers: [{"Content-Type", "application/json"}]},
+                    _opts ->
+          {:ok,
+           %Tesla.Env{
+             status: 500,
+             body: Jason.encode!(%{"code" => 0, "message" => "Error"})
+           }}
+        end
+      )
 
       params = %{
         addresses: addresses,
@@ -199,11 +212,13 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
       assert Enum.count(results.block_ranges) == 1
       assert Enum.count(results.hashes) == 4
       # 7000 addresses + 2 blocks + 2 transactions
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 7004
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 7004
     end
 
-    test "returns {:error, data_to_retry} when an error occurs in all chunks during processing and 'multichain_search_db_export_retry_queue' table is populated with all the input data" do
+    test "returns {:error, data_to_retry} when an error occurs in all chunks during processing and 'multichain_search_db_main_export_queue' table is populated with all the input data" do
       bypass = Bypass.open()
+
+      Application.put_env(:tesla, :adapter, Tesla.Adapter.Mint)
 
       Application.put_env(:explorer, MultichainSearch,
         service_url: "http://localhost:#{bypass.port}",
@@ -226,7 +241,7 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
         )
       end)
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 0
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 0
 
       addresses = 10 |> insert_list(:address)
 
@@ -241,11 +256,13 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
       assert Enum.count(results.block_ranges) == 0
       assert Enum.count(results.hashes) == 0
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 10
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 10
     end
 
-    test "returns {:error, data_to_retry} when an error occurs in all chunks (and number of chunks more than @max_concurrency) during processing and 'multichain_search_db_export_retry_queue' table is populated with all the input data" do
+    test "returns {:error, data_to_retry} when an error occurs in all chunks (and number of chunks more than @max_concurrency) during processing and 'multichain_search_db_main_export_queue' table is populated with all the input data" do
       bypass = Bypass.open()
+
+      Application.put_env(:tesla, :adapter, Tesla.Adapter.Mint)
 
       Application.put_env(:explorer, MultichainSearch,
         service_url: "http://localhost:#{bypass.port}",
@@ -268,7 +285,7 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
         )
       end)
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 0
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 0
 
       addresses = 15 |> insert_list(:address)
 
@@ -283,7 +300,7 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearchTest do
       assert Enum.count(results.block_ranges) == 0
       assert Enum.count(results.hashes) == 0
 
-      assert Repo.aggregate(MultichainSearchDbExportRetryQueue, :count, :hash) == 15
+      assert Repo.aggregate(MainExportQueue, :count, :hash) == 15
     end
   end
 

@@ -23,7 +23,7 @@ defmodule BlockScoutWeb.Mixfile do
         dialyzer: :test
       ],
       start_permanent: Mix.env() == :prod,
-      version: "8.1.1",
+      version: "9.0.0",
       xref: [
         exclude: [
           Explorer.Chain.PolygonZkevm.Reader,
@@ -109,7 +109,8 @@ defmodule BlockScoutWeb.Mixfile do
       {:floki, "~> 0.31"},
       {:flow, "~> 1.2"},
       {:gettext, "~> 0.26.1"},
-      {:hammer, "~> 6.0"},
+      {:hammer, "~> 7.0"},
+      {:hammer_backend_redis, "~> 7.0"},
       {:httpoison, "~> 2.0"},
       {:indexer, in_umbrella: true, runtime: false},
       # JSON parser and generator
@@ -161,7 +162,9 @@ defmodule BlockScoutWeb.Mixfile do
       {:ueberauth_auth0, "~> 2.0"},
       {:utils, in_umbrella: true},
       {:bureaucrat, "~> 0.2.9", only: :test},
-      {:logger_json, "~> 5.1"}
+      {:logger_json, "~> 5.1"},
+      {:open_api_spex, "~> 3.21"},
+      {:ymlr, "~> 5.1"}
     ]
   end
 
