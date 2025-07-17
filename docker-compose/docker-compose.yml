@@ -36,9 +36,9 @@ services:
     ports:
       - "4000:4000"
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://site1.moralis-nodes.com/avalanche/bd211db4527e442bad5cc305a4acdfed
-        ETHEREUM_JSONRPC_TRACE_URL: https://site1.moralis-nodes.com/avalanche/bd211db4527e442bad5cc305a4acdfed
-        ETHEREUM_JSONRPC_WS_URL: wss://api.avax.network/ext/bc/C/ws
+        ETHEREUM_JSONRPC_HTTP_URL: http://152.53.53.172:9650/ext/bc/C/rpc
+        ETHEREUM_JSONRPC_TRACE_URL: http://152.53.53.172:9650/ext/bc/C/rpc
+        ETHEREUM_JSONRPC_WS_URL: ws://152.53.53.172:9650/ext/bc/C/ws
         CHAIN_ID: '146'
 
   nft_media_handler:
