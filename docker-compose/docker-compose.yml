@@ -39,7 +39,7 @@ services:
         ETHEREUM_JSONRPC_HTTP_URL: http://152.53.53.172:9650/ext/bc/C/rpc
         ETHEREUM_JSONRPC_TRACE_URL: http://152.53.53.172:9650/ext/bc/C/rpc
         ETHEREUM_JSONRPC_WS_URL: ws://152.53.53.172:9650/ext/bc/C/ws
-        CHAIN_ID: '146'
+        CHAIN_ID: '43114'
 
   nft_media_handler:
     depends_on:
