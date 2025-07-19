@@ -4,6 +4,7 @@
 
 ### 🚀 Features
 
+- Export balances to Multichain DB([#12726](https://github.com/blockscout/blockscout/pull/12726))
 - Add eip7702 authorization status fetcher ([#12451](https://github.com/blockscout/blockscout/issues/12451))
 - Add token1155tx token404tx api v1 endpoints ([#12720](https://github.com/blockscout/blockscout/issues/12720))
 - Async multichain data export ([#12490](https://github.com/blockscout/blockscout/issues/12490))
@@ -19,6 +20,11 @@
 
 ### 🐛 Bug Fixes
 
+- Fix multichain export queues processing ([#12822](https://github.com/blockscout/blockscout/pull/12822))
+- Remove token_id parameter from coin balance payload to Multichain service API endpoint ([#12817](https://github.com/blockscout/blockscout/pull/12817))
+- Sanitize empty block_ranges payload before sending HTTP request to Multichain service([#12816](https://github.com/blockscout/blockscout/pull/12816))
+- Disable Indexer.Fetcher.Optimism.Interop.MultichainExport for non-OP chains ([#12814](https://github.com/blockscout/blockscout/pull/12814))
+- Fix flaky test for exporting balances to Multichain DB ([#12813](https://github.com/blockscout/blockscout/pull/12813))
 - Filter out creation internal transaction with `index == 0` ([#12777](https://github.com/blockscout/blockscout/issues/12777))
 - Filter out scilla transactions in internal transactions fetcher ([#12793](https://github.com/blockscout/blockscout/issues/12793))
 - Change default ordering in `/api/v2/smart-contracts` ([#12767](https://github.com/blockscout/blockscout/issues/12767))
@@ -55,6 +61,8 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- migrate Auth0 to mint as well ([#12807](https://github.com/blockscout/blockscout/pull/12807))
+- Migrate from HTTPoison to Tesla.Mint ([#12699](https://github.com/blockscout/blockscout/pull/12699))
 - Merge adjacent missing block ranges ([#12778](https://github.com/blockscout/blockscout/issues/12778))
 - Optimize missing block ranges operations ([#12705](https://github.com/blockscout/blockscout/issues/12705))
 - Hold parity with Etherscan APIv1 for `getcontractcreation` and `getblocknobytime` endpoints ([#12721](https://github.com/blockscout/blockscout/issues/12721))
@@ -71,7 +79,6 @@
 - Support multiple interop messages view on transaction page ([#12455](https://github.com/blockscout/blockscout/issues/12455))
 - Remove `is_self_destructed` field in `/api/v2/smart-contracts/{address_hash}` response ([#12239](https://github.com/blockscout/blockscout/issues/12239))
 - Set home directory for blockscout user ([#12337](https://github.com/blockscout/blockscout/issues/12337))
-- Migrate from HTTPoison to Tesla.Mint ([#12699](https://github.com/blockscout/blockscout/pull/12699))
 
 
 | Variable              | Description                                                                                                                                                      | Parameters                                                                                      |

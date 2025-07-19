@@ -1,14 +1,17 @@
 defmodule Explorer.Chain.MultichainSearchDb.MainExportQueue do
   @moduledoc """
-  Tracks data pending for export to the Multichain Service database.
+  Tracks main blockchain data: block, transaction hashes, addresses with the metadata and block ranges,
+  pending for export to the Multichain Service database.
   """
 
   use Explorer.Schema
   import Ecto.Query
-  alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Block.Range
+  alias Explorer.Repo
 
   @required_attrs ~w(hash hash_type)a
+  @optional_attrs ~w(block_range retries_number)a
+  @allowed_attrs @optional_attrs ++ @required_attrs
 
   @primary_key false
   typed_schema "multichain_search_db_main_export_queue" do
@@ -31,7 +34,7 @@ defmodule Explorer.Chain.MultichainSearchDb.MainExportQueue do
 
   def changeset(%__MODULE__{} = pending_ops, attrs) do
     pending_ops
-    |> cast(attrs, @required_attrs)
+    |> cast(attrs, @allowed_attrs)
     |> validate_required(@required_attrs)
   end
 
@@ -50,8 +53,17 @@ defmodule Explorer.Chain.MultichainSearchDb.MainExportQueue do
       block_range: export.block_range
     })
     |> order_by([export], fragment("upper(?) DESC", export.block_range))
-    |> Chain.add_fetcher_limit(limited?)
+    |> add_main_queue_fetcher_limit(limited?)
     |> Repo.stream_reduce(initial, reducer)
+  end
+
+  defp add_main_queue_fetcher_limit(query, false), do: query
+
+  defp add_main_queue_fetcher_limit(query, true) do
+    main_queue_fetcher_limit =
+      Application.get_env(:indexer, Indexer.Fetcher.MultichainSearchDb.MainExportQueue)[:init_limit]
+
+    limit(query, ^main_queue_fetcher_limit)
   end
 
   @doc """
