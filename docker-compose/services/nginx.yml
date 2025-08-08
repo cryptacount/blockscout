@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   proxy:
     image: nginx
@@ -11,6 +9,11 @@ services:
     environment:
       BACK_PROXY_PASS: ${BACK_PROXY_PASS:-http://backend:4000}
       FRONT_PROXY_PASS: ${FRONT_PROXY_PASS:-http://frontend:3000}
+
+      # Новые переменные для rpc.conf.template
+      RPC_LISTEN_PORT: ${RPC_LISTEN_PORT:-8545}
+      TATUM_URL: ${TATUM_URL:-https://avax-mainnet.gateway.tatum.io/}
+      TATUM_API_KEY: "t-67aef2ee74c77aa851dd5eca-d8a896d214164ad7a52edbe0"
     ports:
       - target: 80
         published: 80
@@ -18,3 +21,5 @@ services:
         published: 8080
       - target: 8081
         published: 8081
+      - target: 8545          # <<< новый порт внутри контейнера
+        published: 8545       # <<< публикуем наружу
