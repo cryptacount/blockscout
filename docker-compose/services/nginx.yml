@@ -12,7 +12,7 @@ services:
       RPC_LISTEN_PORT: "8545"
       RPC_SERVER_NAME: "_"
       TATUM_URL: "https://avax-mainnet.gateway.tatum.io/"
-      TATUM_API_KEY: "t-68962358c60a24089e2e3e1d-52040ae9113748d7a69deeb1"
+      TATUM_API_KEY: ${TATUM_API_KEY}
     ports:
       - target: 80
         published: 80
