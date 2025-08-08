@@ -36,9 +36,9 @@ services:
     ports:
       - "4000:4000"
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://proxy:8081
-        ETHEREUM_JSONRPC_TRACE_URL: http://proxy:8081
-        ETHEREUM_JSONRPC_WS_URL: ws://proxy:8081
+        ETHEREUM_JSONRPC_HTTP_URL: http://proxy:8545
+        ETHEREUM_JSONRPC_TRACE_URL: http://proxy:8545
+        ETHEREUM_JSONRPC_WS_URL: ws://proxy:8545
         CHAIN_ID: '43114'
 
   nft_media_handler:
