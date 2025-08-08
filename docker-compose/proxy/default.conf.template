@@ -88,6 +88,13 @@ server {
             add_header 'Content-Type' 'text/plain charset=UTF-8';
             add_header 'Content-Length' 0;
             return 204;
-        }
+    # Проксирование RPC на Tatum с добавлением заголовка
+    location /rpc {
+        proxy_pass https://avax-mainnet.gateway.tatum.io;
+        proxy_set_header Host avax-mainnet.gateway.tatum.io;
+        proxy_set_header Accept application/json;
+        proxy_set_header Content-Type application/json;
+        proxy_set_header x-api-key "t-67aef2ee74c77aa851dd5eca-d8a896d214164ad7a52edbe0";
     }
+
 }

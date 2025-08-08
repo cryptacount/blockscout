@@ -36,9 +36,9 @@ services:
     ports:
       - "4000:4000"
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://67.211.220.120:9650/ext/bc/C/rpc
-        ETHEREUM_JSONRPC_TRACE_URL: http://67.211.220.120:9650/ext/bc/C/rpc
-        ETHEREUM_JSONRPC_WS_URL: ws://67.211.220.120:9650/ext/bc/C/ws
+        ETHEREUM_JSONRPC_HTTP_URL: http://proxy/rpc
+        ETHEREUM_JSONRPC_TRACE_URL: http://proxy/rpc
+        ETHEREUM_JSONRPC_WS_URL: ws://proxy/rpc
         CHAIN_ID: '43114'
 
   nft_media_handler:
