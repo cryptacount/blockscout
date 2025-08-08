@@ -1,0 +1,32 @@
+server {
+    listen 8081;
+    server_name _;
+
+    # (Опционально) если нужен DNS внутри контейнера
+    resolver 1.1.1.1 1.0.0.1 valid=30s;
+
+    # Любой путь шлём на Tatum
+    location / {
+        proxy_pass https://avax-mainnet.gateway.tatum.io/;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host avax-mainnet.gateway.tatum.io;
+
+        # Твой ключ
+        proxy_set_header X-API-KEY t-67aef2ee74c77aa851dd5eca-d8a896d214164ad7a52edbe0;
+
+        # Эти два не обязательны (клиент и так их шлёт), но можно оставить
+        proxy_set_header Accept application/json;
+        proxy_set_header Content-Type application/json;
+
+        # Прочие дефолтные заголовки
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+
+        # Таймауты под длинные JSON-RPC ответы
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+    }
+}
