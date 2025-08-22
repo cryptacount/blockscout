@@ -4,6 +4,9 @@ import Config
 |> Path.join()
 |> Code.eval_file()
 
+config :logger,
+  backends: ConfigHelper.logger_backends()
+
 ######################
 ### BlockScout Web ###
 ######################
@@ -662,14 +665,8 @@ config :explorer, Explorer.MicroserviceInterfaces.TACOperationLifecycle,
   enabled: ConfigHelper.parse_bool_env_var("MICROSERVICE_TAC_OPERATION_LIFECYCLE_ENABLED", "true"),
   service_url: System.get_env("MICROSERVICE_TAC_OPERATION_LIFECYCLE_URL")
 
-config :explorer, :air_table_public_tags,
-  table_url: System.get_env("ACCOUNT_PUBLIC_TAGS_AIRTABLE_URL"),
-  api_key: System.get_env("ACCOUNT_PUBLIC_TAGS_AIRTABLE_API_KEY")
-
 audit_reports_table_url = System.get_env("CONTRACT_AUDIT_REPORTS_AIRTABLE_URL")
-
-audit_reports_api_key =
-  System.get_env("CONTRACT_AUDIT_REPORTS_AIRTABLE_API_KEY") || System.get_env("ACCOUNT_PUBLIC_TAGS_AIRTABLE_API_KEY")
+audit_reports_api_key = System.get_env("CONTRACT_AUDIT_REPORTS_AIRTABLE_API_KEY")
 
 config :explorer, :air_table_audit_reports,
   table_url: audit_reports_table_url,
@@ -1142,21 +1139,21 @@ config :indexer, Indexer.Migrator.RecoveryWETHTokenTransfers,
 
 config :indexer, Indexer.Fetcher.MultichainSearchDb.MainExportQueue,
   concurrency: ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_CONCURRENCY", 10),
-  batch_size: ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_BATCH_SIZE", 1_000),
+  batch_size: ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_BATCH_SIZE", 3_000),
   enqueue_busy_waiting_timeout:
     ConfigHelper.parse_time_env_var(
       "INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_ENQUEUE_BUSY_WAITING_TIMEOUT",
       "1s"
     ),
   max_queue_size:
-    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_MAX_QUEUE_SIZE", 1_000),
+    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_MAX_QUEUE_SIZE", 3_000),
   init_limit:
-    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_INIT_QUERY_LIMIT", 1_000)
+    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_MAIN_QUEUE_INIT_QUERY_LIMIT", 3_000)
 
 config :indexer, Indexer.Fetcher.MultichainSearchDb.BalancesExportQueue,
   concurrency: ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_BALANCES_QUEUE_CONCURRENCY", 10),
   batch_size:
-    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_BALANCES_QUEUE_BATCH_SIZE", 1_000),
+    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_BALANCES_QUEUE_BATCH_SIZE", 3_000),
   enqueue_busy_waiting_timeout:
     ConfigHelper.parse_time_env_var(
       "INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_BALANCES_QUEUE_ENQUEUE_BUSY_WAITING_TIMEOUT",
@@ -1165,10 +1162,10 @@ config :indexer, Indexer.Fetcher.MultichainSearchDb.BalancesExportQueue,
   max_queue_size:
     ConfigHelper.parse_integer_env_var(
       "INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_BALANCES_QUEUE_MAX_QUEUE_SIZE",
-      1_000
+      3_000
     ),
   init_limit:
-    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_BALANCES_QUEUE_INIT_QUERY_LIMIT", 1_000)
+    ConfigHelper.parse_integer_env_var("INDEXER_MULTICHAIN_SEARCH_DB_EXPORT_BALANCES_QUEUE_INIT_QUERY_LIMIT", 3_000)
 
 config :indexer, Indexer.Fetcher.MultichainSearchDb.TokenInfoExportQueue,
   concurrency:
@@ -1207,7 +1204,9 @@ config :indexer, Indexer.Fetcher.Optimism.Interop.MessageQueue.Supervisor,
   disabled?: ConfigHelper.chain_type() != :optimism
 
 config :indexer, Indexer.Fetcher.Optimism.Interop.MultichainExport.Supervisor,
-  disabled?: ConfigHelper.chain_type() != :optimism
+  disabled?:
+    ConfigHelper.chain_type() != :optimism ||
+      ConfigHelper.parse_bool_env_var("INDEXER_DISABLE_OPTIMISM_INTEROP_MULTICHAIN_EXPORT", "true")
 
 config :indexer, Indexer.Fetcher.Optimism,
   optimism_l1_rpc: System.get_env("INDEXER_OPTIMISM_L1_RPC"),

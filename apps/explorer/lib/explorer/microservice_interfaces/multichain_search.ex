@@ -518,9 +518,9 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearch do
           :transfers_count => String.t(),
           :holders_count => String.t()
         }
-  def prepare_token_counters_for_queue(transfer_count, holder_count) do
+  def prepare_token_counters_for_queue(transfers_count, holders_count) do
     if enabled?() do
-      %{transfers_count: to_string(transfer_count), holders_count: to_string(holder_count)}
+      %{transfers_count: to_string(transfers_count), holders_count: to_string(holders_count)}
     else
       %{}
     end
@@ -867,14 +867,17 @@ defmodule Explorer.MicroserviceInterfaces.MultichainSearch do
       block_ranges_in_chunk = if index == 0, do: block_ranges, else: []
       address_token_balances_in_chunk = address_token_balances_chunk_by_index(address_token_balances, index)
 
+      address_coin_balances_chunk =
+        case Enum.fetch(indexed_address_coin_balances_chunks, index) do
+          {:ok, {chunk, ^index}} when is_list(chunk) -> chunk
+          _ -> []
+        end
+
       base_data_chunk
       |> Map.put(:addresses, addresses_chunk)
       |> Map.put(
         :address_coin_balances,
-        if(Enum.empty?(indexed_address_coin_balances_chunks),
-          do: [],
-          else: indexed_address_coin_balances_chunks |> Enum.at(index) |> elem(0) || []
-        )
+        address_coin_balances_chunk
       )
       |> Map.put(:hashes, hashes_in_chunk)
       |> Map.put(:block_ranges, block_ranges_in_chunk)
